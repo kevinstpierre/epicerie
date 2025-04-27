@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste d'Épicerie - Gestion</title>
+    <style>
+        :root {
+            --primary-green: #4CAF50;
+            --dark-green: #388E3C;
+            --light-green: #C8E6C9;
+            --text-color: #f0f0f0;
+            --error-color: #f44336;
+            --success-color: #43A047;
+            --background-dark: #121212;
+            --card-background: #1E1E1E;
+            --border-color: #333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--background-dark);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .auth-container {
+            max-width: 400px;
+            margin: 50px auto;
+            background: var(--card-background);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            border: 1px solid var(--border-color);
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--primary-green);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 16px;
+            background-color: var(--background-dark);
+            color: var(--text-color);
+        }
+
+        input:focus,
+        select:focus {
+            border-color: var(--primary-green);
+            outline: none;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn {
+            background-color: var(--primary-green);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: var(--dark-green);
+        }
+
+        .btn-secondary {
+            background-color: #757575;
+        }
+
+        .btn-secondary:hover {
+            background-color: #616161;
+        }
+
+        .btn-danger {
+            background-color: var(--error-color);
+        }
+
+        .btn-danger:hover {
+            background-color: #d32f2f;
+        }
+
+        .auth-switch {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .auth-switch a {
+            color: var(--primary-green);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .alert-success {
+            background-color: #E8F5E9;
+            color: var(--success-color);
+            border: 1px solid var(--success-color);
+        }
+
+        .alert-error {
+            background-color: #FFEBEE;
+            color: var(--error-color);
+            border: 1px solid var(--error-color);
+        }
+
+        .navbar {
+            background-color: var(--primary-green);
+            padding: 15px 0;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .navbar-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .navbar-menu {
+            display: flex;
+            gap: 20px;
+        }
+
+        .navbar-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .navbar-menu a:hover {
+            background-color: var(--dark-green);
+        }
+
+        .item-form {
+            background: var(--card-background);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+        }
+
+        .items-list {
+            display: grid;
+            gap: 20px;
+        }
+
+        .item-card {
+            background: var(--card-background);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .item-info {
+            flex: 1;
+        }
+
+        .item-category {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 14px;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .category-epicerie { background-color: #FF9800; }
+        .category-quincaillerie { background-color: #795548; }
+        .category-pharmacie { background-color: #2196F3; }
+        .category-magasin-linge { background-color: #9C27B0; }
+        .category-autre { background-color: #607D8B; }
+
+        .item-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-background);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            border: 1px solid var(--border-color);
+        }
+
+        .admin-table th,
+        .admin-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .admin-table th {
+            background-color: var(--dark-green);
+            font-weight: 600;
+            color: white;
+        }
+
+        .admin-table tr:hover {
+            background-color: rgba(76, 175, 80, 0.1);
+        }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 14px;
+            color: white;
+        }
+
+        .status-approved { background-color: var(--success-color); }
+        .status-pending { background-color: #FFC107; }
+        .status-rejected { background-color: var(--error-color); }
+
+        .admin-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #aaa;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--card-background);
+            padding: 30px;
+            border-radius: 10px;
+            min-width: 300px;
+            z-index: 1001;
+            border: 1px solid var(--border-color);
+        }
+
+        .modal h3 {
+            margin-bottom: 20px;
+            color: var(--primary-green);
+        }
+
+        .sync-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 8px 15px;
+            background: var(--dark-green);
+            color: white;
+            border-radius: 20px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .sync-dot {
+            width: 8px;
+            height: 8px;
+            background: #4CAF50;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        .share-list-form {
+            margin-top: 30px;
+            background: var(--card-background);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .shared-users {
+            margin-top: 15px;
+        }
+
+        .shared-user-badge {
+            display: inline-block;
+            background: var(--dark-green);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            margin: 5px;
+            font-size: 14px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: #888;
+        }
+
+        @media (max-width: 768px) {
+            .navbar-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .admin-table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            .item-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .admin-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .admin-actions .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="loginPage" class="page active">
+        <div class="auth-container">
+            <h1 class="auth-header">Connexion</h1>
+            <div id="loginMessage"></div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Mot de passe</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn">Se connecter</button>
+            </form>
+            <div class="auth-switch">
+                <p>Pas encore de compte? <a href="#" onclick="showPage('registerPage')">S'inscrire</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Page -->
+    <div id="registerPage" class="page">
+        <div class="auth-container">
+            <h1 class="auth-header">Inscription</h1>
+            <div id="registerMessage"></div>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="registerName">Nom complet</label>
+                    <input type="text" id="registerName" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerEmail">Email</label>
+                    <input type="email" id="registerEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Mot de passe</label>
+                    <input type="password" id="registerPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerConfirmPassword">Confirmer le mot de passe</label>
+                    <input type="password" id="registerConfirmPassword" required>
+                </div>
+                <button type="submit" class="btn">S'inscrire</button>
+            </form>
+            <div class="auth-switch">
+                <p>Déjà un compte? <a href="#" onclick="showPage('loginPage')">Se connecter</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shopping List Page -->
+    <div id="shoppingPage" class="page">
+        <nav class="navbar">
+            <div class="navbar-content">
+                <div class="navbar-brand">Ma Liste d'Épicerie</div>
+                <div class="navbar-menu">
+                    <a href="#" onclick="showPage('shoppingPage')">Liste</a>
+                    <a href="#" id="adminLink" style="display: none;" onclick="showPage('adminPage')">Admin</a>
+                    <a href="#" onclick="logout()">Déconnexion</a>
+                </div>
+            </div>
+        </nav>
+
+        <div class="sync-indicator">
+            <div class="sync-dot"></div>
+            <span>Synchronisé</span>
+        </div>
+
+        <div class="container">
+            <div class="item-form">
+                <h2>Ajouter un article</h2>
+                <form id="itemForm">
+                    <div class="form-group">
+                        <label for="itemName">Nom de l'article</label>
+                        <input type="text" id="itemName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="itemCategory">Catégorie</label>
+                        <select id="itemCategory" required>
+                            <option value="">Sélectionner un lieu</option>
+                            <option value="epicerie">Épicerie</option>
+                            <option value="quincaillerie">Quincaillerie</option>
+                            <option value="pharmacie">Pharmacie</option>
+                            <option value="magasin-linge">Magasin Linge</option>
+                            <option value="autre">Autre Magasin</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="itemQuantity">Quantité</label>
+                        <input type="number" id="itemQuantity" min="1" value="1" required>
+                    </div>
+                    <button type="submit" class="btn">Ajouter à la liste</button>
+                </form>
+            </div>
+
+            <h2>Ma liste de courses</h2>
+            <div id="itemsList" class="items-list">
+                <!-- Items will be dynamically added here -->
+            </div>
+
+            <div class="share-list-form">
+                <h3>Partager ma liste</h3>
+                <form id="shareForm">
+                    <div class="form-group">
+                        <label for="shareEmail">Email de l'utilisateur</label>
+                        <input type="email" id="shareEmail" required>
+                    </div>
+                    <button type="submit" class="btn">Partager</button>
+                </form>
+                <div class="shared-users">
+                    <h4>Partagé avec:</h4>
+                    <div id="sharedUsersList">
+                        <!-- Shared users will be dynamically added here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Page -->
+    <div id="adminPage" class="page">
+        <nav class="navbar">
+            <div class="navbar-content">
+                <div class="navbar-brand">Panel Admin</div>
+                <div class="navbar-menu">
+                    <a href="#" onclick="showPage('shoppingPage')">Liste</a>
+                    <a href="#" onclick="showPage('adminPage')">Admin</a>
+                    <a href="#" onclick="logout()">Déconnexion</a>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container">
+            <h2>Gestion des utilisateurs</h2>
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                    <!-- Users will be dynamically added here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Initialize localStorage data
+        if (!localStorage.getItem('users')) {
+            localStorage.setItem('users', JSON.stringify([
+                {
+                    id: 1,
+                    name: 'Admin',
+                    email: 'stpkevpro2024@gmail.com',
+                    password: 'admin123',
+                    status: 'approved',
+                    isAdmin: true
+                }
+            ]));
+        }
+
+        if (!localStorage.getItem('items')) {
+            localStorage.setItem('items', JSON.stringify([]));
+        }
+
+        if (!localStorage.getItem('sharedLists')) {
+            localStorage.setItem('sharedLists', JSON.stringify({}));
+        }
+
+        // State management
+        let currentUser = null;
+        let syncInterval = null;
+
+        // Simulate WebSocket connection
+        class SyncService {
+            constructor() {
+                this.listeners = [];
+            }
+
+            subscribe(callback) {
+                this.listeners.push(callback);
+            }
+
+            broadcast(event, data) {
+                this.listeners.forEach(listener => listener(event, data));
+                // Simulate network delay
+                setTimeout(() => {
+                    const syncIndicator = document.querySelector('.sync-indicator span');
+                    syncIndicator.textContent = 'Synchronisé';
+                }, 500);
+            }
+
+            startSync() {
+                if (syncInterval) clearInterval(syncInterval);
+                syncInterval = setInterval(() => {
+                    // Simulate checking for updates
+                    this.checkForUpdates();
+                }, 3000);
+            }
+
+            checkForUpdates() {
+                // In a real app, this would check a server for updates
+                const items = JSON.parse(localStorage.getItem('items'));
+                const sharedLists = JSON.parse(localStorage.getItem('sharedLists'));
+                
+                if (currentUser) {
+                    const sharedWithMe = Object.entries(sharedLists)
+                        .filter(([ownerId, shared]) => shared.includes(currentUser.id))
+                        .map(([ownerId]) => parseInt(ownerId));
+                    
+                    const visibleItems = items.filter(item => 
+                        item.userId === currentUser.id || sharedWithMe.includes(item.userId)
+                    );
+                    
+                    this.broadcast('items_updated', visibleItems);
+                }
+            }
+        }
+
+        const syncService = new SyncService();
+
+        // Subscribe to sync events
+        syncService.subscribe((event, data) => {
+            if (event === 'items_updated') {
+                updateItemsList(data);
+            }
+        });
+
+        // Show page function
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        // Login form submission
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            const users = JSON.parse(localStorage.getItem('users'));
+            const user = users.find(u => u.email === email && u.password === password);
+            
+            if (user) {
+                if (user.status === 'approved') {
+                    currentUser = user;
+                    localStorage.setItem('currentUser', JSON.stringify(user));
+                    if (user.isAdmin) {
+                        document.getElementById('adminLink').style.display = 'block';
+                    }
+                    showPage('shoppingPage');
+                    loadItems();
+                    loadSharedUsers();
+                    syncService.startSync();
+                } else if (user.status === 'pending') {
+                    showMessage('loginMessage', 'Votre compte est en attente d\'approbation', 'error');
+                } else {
+                    showMessage('loginMessage', 'Votre compte a été refusé', 'error');
+                }
+            } else {
+                showMessage('loginMessage', 'Email ou mot de passe incorrect', 'error');
+            }
+        });
+
+        // Register form submission
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerConfirmPassword').value;
+
+            if (password !== confirmPassword) {
+                showMessage('registerMessage', 'Les mots de passe ne correspondent pas', 'error');
+                return;
+            }
+
+            const users = JSON.parse(localStorage.getItem('users'));
+            
+            if (users.some(u => u.email === email)) {
+                showMessage('registerMessage', 'Cet email est déjà utilisé', 'error');
+                return;
+            }
+
+            const newUser = {
+                id: users.length + 1,
+                name: name,
+                email: email,
+                password: password,
+                status: email === 'stpkevpro2024@gmail.com' ? 'approved' : 'pending',
+                isAdmin: email === 'stpkevpro2024@gmail.com'
+            };
+
+            users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            showMessage('registerMessage', 'Inscription réussie! Veuillez attendre l\'approbation de l\'administrateur.', 'success');
+            setTimeout(() => showPage('loginPage'), 2000);
+        });
+
+        // Item form submission
+        document.getElementById('itemForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('itemName').value;
+            const category = document.getElementById('itemCategory').value;
+            const quantity = document.getElementById('itemQuantity').value;
+
+            const items = JSON.parse(localStorage.getItem('items'));
+            const newItem = {
+                id: Date.now(),
+                name: name,
+                category: category,
+                quantity: quantity,
+                userId: currentUser.id,
+                completed: false,
+                createdBy: currentUser.name,
+                createdAt: new Date().toISOString()
+            };
+
+            items.push(newItem);
+            localStorage.setItem('items', JSON.stringify(items));
+            
+            // Broadcast update
+            syncService.broadcast('item_added', newItem);
+            
+            document.getElementById('itemForm').reset();
+            loadItems();
+        });
+
+        // Share form submission
+        document.getElementById('shareForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('shareEmail').value;
+            
+            const users = JSON.parse(localStorage.getItem('users'));
+            const userToShare = users.find(u => u.email === email && u.status === 'approved');
+            
+            if (!userToShare) {
+                alert('Utilisateur non trouvé ou non approuvé');
+                return;
+            }
+            
+            if (userToShare.id === currentUser.id) {
+                alert('Vous ne pouvez pas partager avec vous-même');
+                return;
+            }
+            
+            const sharedLists = JSON.parse(localStorage.getItem('sharedLists'));
+            if (!sharedLists[currentUser.id]) {
+                sharedLists[currentUser.id] = [];
+            }
+            
+            if (!sharedLists[currentUser.id].includes(userToShare.id)) {
+                sharedLists[currentUser.id].push(userToShare.id);
+                localStorage.setItem('sharedLists', JSON.stringify(sharedLists));
+                
+                // Broadcast update
+                syncService.broadcast('list_shared', {
+                    owner: currentUser.id,
+                    sharedWith: userToShare.id
+                });
+                
+                loadSharedUsers();
+            }
+            
+            document.getElementById('shareForm').reset();
+        });
+
+        // Load shared users
+        function loadSharedUsers() {
+            const sharedLists = JSON.parse(localStorage.getItem('sharedLists'));
+            const users = JSON.parse(localStorage.getItem('users'));
+            const sharedUsersList = document.getElementById('sharedUsersList');
+            
+            const sharedUsers = (sharedLists[currentUser.id] || [])
+                .map(userId => users.find(u => u.id === userId))
+                .filter(Boolean);
+            
+            if (sharedUsers.length === 0) {
+                sharedUsersList.innerHTML = '<p>Aucun utilisateur</p>';
+                return;
+            }
+            
+            sharedUsersList.innerHTML = sharedUsers.map(user => `
+                <span class="shared-user-badge">${user.name} (${user.email})</span>
+            `).join('');
+        }
+
+        // Load items
+        function loadItems() {
+            const items = JSON.parse(localStorage.getItem('items'));
+            const sharedLists = JSON.parse(localStorage.getItem('sharedLists'));
+            const users = JSON.parse(localStorage.getItem('users'));
+            
+            // Get shared list IDs
+            const sharedWithMe = Object.entries(sharedLists)
+                .filter(([ownerId, shared]) => shared.includes(currentUser.id))
+                .map(([ownerId]) => parseInt(ownerId));
+            
+            // Get visible items (own items + shared items)
+            const visibleItems = items.filter(item => 
+                item.userId === currentUser.id || sharedWithMe.includes(item.userId)
+            );
+            
+            updateItemsList(visibleItems);
+        }
+
+        // Update items list
+        function updateItemsList(items) {
+            const itemsList = document.getElementById('itemsList');
+            const users = JSON.parse(localStorage.getItem('users'));
+
+            if (items.length === 0) {
+                itemsList.innerHTML = '<div class="empty-state">Aucun article dans votre liste</div>';
+                return;
+            }
+
+            itemsList.innerHTML = items.map(item => {
+                const creator = users.find(u => u.id === item.userId);
+                return `
+                    <div class="item-card">
+                        <div class="item-info">
+                            <span class="item-category category-${item.category}">${getCategoryLabel(item.category)}</span>
+                            <h3>${item.name}</h3>
+                            <p>Quantité: ${item.quantity}</p>
+                            <div class="user-info">
+                                <span>Ajouté par: ${item.createdBy || creator?.name || 'Inconnu'}</span>
+                                <span>•</span>
+                                <span>${formatDate(item.createdAt)}</span>
+                            </div>
+                        </div>
+                        <div class="item-actions">
+                            <button class="btn btn-secondary" onclick="toggleItemComplete(${item.id})">
+                                ${item.completed ? 'Non complété' : 'Complété'}
+                            </button>
+                            ${item.userId === currentUser.id || sharedWithMe.includes(item.userId) ? 
+                                `<button class="btn btn-danger" onclick="deleteItem(${item.id})">Supprimer</button>` : 
+                                ''
+                            }
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Load users for admin
+        function loadUsers() {
+            const users = JSON.parse(localStorage.getItem('users'));
+            const usersTableBody = document.getElementById('usersTableBody');
+
+            usersTableBody.innerHTML = users.map(user => `
+                <tr>
+                    <td>${user.name}</td>
+                    <td>${user.email}</td>
+                    <td>
+                        <span class="status-badge status-${user.status}">
+                            ${getStatusLabel(user.status)}
+                        </span>
+                    </td>
+                    <td>
+                        ${user.isAdmin ? 'Administrateur' : getUserActions(user)}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // User actions for admin
+        function getUserActions(user) {
+            if (user.status === 'pending') {
+                return `
+                    <div class="admin-actions">
+                        <button class="btn" onclick="updateUserStatus(${user.id}, 'approved')">Approuver</button>
+                        <button class="btn btn-danger" onclick="updateUserStatus(${user.id}, 'rejected')">Refuser</button>
+                    </div>
+                `;
+            }
+            return user.status === 'approved' ? 
+                `<button class="btn btn-danger" onclick="updateUserStatus(${user.id}, 'rejected')">Désactiver</button>` :
+                `<button class="btn" onclick="updateUserStatus(${user.id}, 'approved')">Réactiver</button>`;
+        }
+
+        // Update user status
+        function updateUserStatus(userId, status) {
+            const users = JSON.parse(localStorage.getItem('users'));
+            const userIndex = users.findIndex(u => u.id === userId);
+            
+            if (userIndex !== -1) {
+                users[userIndex].status = status;
+                localStorage.setItem('users', JSON.stringify(users));
+                loadUsers();
+            }
+        }
+
+        // Delete item
+        function deleteItem(itemId) {
+            const items = JSON.parse(localStorage.getItem('items'));
+            const filteredItems = items.filter(item => item.id !== itemId);
+            localStorage.setItem('items', JSON.stringify(filteredItems));
+            
+            // Broadcast update
+            syncService.broadcast('item_deleted', itemId);
+            
+            loadItems();
+        }
+
+        // Toggle item completion
+        function toggleItemComplete(itemId) {
+            const items = JSON.parse(localStorage.getItem('items'));
+            const itemIndex = items.findIndex(item => item.id === itemId);
+            
+            if (itemIndex !== -1) {
+                items[itemIndex].completed = !items[itemIndex].completed;
+                localStorage.setItem('items', JSON.stringify(items));
+                
+                // Broadcast update
+                syncService.broadcast('item_updated', items[itemIndex]);
+                
+                loadItems();
+            }
+        }
+
+        // Helper functions
+        function getCategoryLabel(category) {
+            const labels = {
+                'epicerie': 'Épicerie',
+                'quincaillerie': 'Quincaillerie',
+                'pharmacie': 'Pharmacie',
+                'magasin-linge': 'Magasin Linge',
+                'autre': 'Autre Magasin'
+            };
+            return labels[category] || category;
+        }
+
+        function getStatusLabel(status) {
+            const labels = {
+                'approved': 'Approuvé',
+                'pending': 'En attente',
+                'rejected': 'Refusé'
+            };
+            return labels[status] || status;
+        }
+
+        function showMessage(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            setTimeout(() => element.innerHTML = '', 3000);
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('fr-FR', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Logout function
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            document.getElementById('adminLink').style.display = 'none';
+            if (syncInterval) {
+                clearInterval(syncInterval);
+            }
+            showPage('loginPage');
+        }
+
+        // Check if user is logged in
+        const savedUser = localStorage.getItem('currentUser');
+        if (savedUser) {
+            currentUser = JSON.parse(savedUser);
+            if (currentUser.isAdmin) {
+                document.getElementById('adminLink').style.display = 'block';
+            }
+            showPage('shoppingPage');
+            loadItems();
+            loadSharedUsers();
+            syncService.startSync();
+        }
+
+        // Load users if admin page is active
+        document.addEventListener('DOMContentLoaded', function() {
+            if (document.getElementById('adminPage').classList.contains('active')) {
+                loadUsers();
+            }
+        });
+
+        // Handle page visibility changes for sync
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'visible' && currentUser) {
+                syncService.checkForUpdates();
+            }
+        });
+
+        // Simulate real-time updates (in a real app, this would use WebSocket)
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'items' && currentUser) {
+                syncService.checkForUpdates();
+            }
+        });
+    </script>
+</body>
+</html>
